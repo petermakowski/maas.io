@@ -139,9 +139,11 @@
 
 <script>
 (function() {
+  var hashLinks = [];
   function setActiveLink(navigationItems) {
     [].forEach.call(navigationItems, function(item) {
       var link = item.querySelector('.p-tutorial__nav-link');
+      hashLinks.push(link)
       if (link.getAttribute('href') === window.location.hash) {
         item.classList.add('is-active');
       } else {
@@ -156,8 +158,12 @@
   setActiveLink(navigationItems);
 
   window.addEventListener('hashchange', function(e) {
-    e.preventDefault();
-    setActiveLink(navigationItems);
+    if (hashLinks.includes(e.newURL.match(/#(.+)/)[1])) {
+      e.preventDefault();
+      setActiveLink(navigationItems);
+    } else {
+      window.location.hash = e.oldURL.match(/#(.+)/)[1]
+    }
   });
 
   sectionIds = [];
@@ -168,7 +174,7 @@
   });
 
   // Navigate to first tutorial step on load if no URL hash
-  if (!window.location.hash) {
+  if (!window.location.hash || !hashLinks.includes(window.location.hash)) {
     var firstSectionLink = document.querySelector('.p-tutorial__nav-link');
     window.location.hash = firstSectionLink.getAttribute('href');
   } else {
